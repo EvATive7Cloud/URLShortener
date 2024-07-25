@@ -1,2 +1,4 @@
 __pycache__
 shortlinks.db
+.venv
+run.bat
