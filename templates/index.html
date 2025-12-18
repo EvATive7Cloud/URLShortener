@@ -1,141 +1,420 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Shortener</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
-    <style>
-        body {
-            display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-            margin: 0;
-            font-family: 'Roboto', sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>URL Shortener</title>
+  <style>
+    :root {
+      /* 白色主题配色 */
+      --bg: #f3f4f6;
+      /* 浅灰背景 */
+      --bg-card: #ffffff;
+      /* 纯白卡片 */
+      --border: #e5e7eb;
+      /* 浅灰边框 */
+      --accent: #2563eb;
+      /* 蓝色主色 */
+      --accent-soft: #3b82f6;
+      --text: #111827;
+      /* 深黑文字 */
+      --text-soft: #6b7280;
+      /* 灰色辅助文字 */
+      --danger: #ef4444;
+      --radius: 12px;
+      /* 柔和的阴影 */
+      --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      --bg-result: #f9fafb;
+      /* 结果区域的超浅灰背景 */
+    }
 
-        main {
-            flex: 1 0 auto;
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        .container {
-            max-width: 100%;
-            padding: 0 15px;
-        }
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
 
-        .input-field input[type="text"]:focus+label {
-            color: #42a5f5 !important;
-        }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
 
-        .input-field input[type="text"]:focus {
-            border-bottom: 1px solid #42a5f5 !important;
-            box-shadow: 0 1px 0 0 #42a5f5 !important;
-        }
+    .wrap {
+      width: 100%;
+      /* 宽度加大 */
+      max-width: 640px;
+    }
 
-        .row {
-            margin: 0;
-        }
+    .card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      /* 圆角稍微大一点 */
+      border: 1px solid var(--border);
+      padding: 32px;
+      /* 内边距加大 */
+      box-shadow: var(--shadow);
+    }
 
-        .card {
-            margin: 20px 0;
-        }
+    .header {
+      margin-bottom: 24px;
+      text-align: center;
+      /* 标题居中更美观 */
+    }
 
-        @media only screen and (max-width: 600px) {
-            .container {
-                padding: 0 10px;
-            }
+    .title {
+      font-size: 24px;
+      /* 标题字体加大 */
+      font-weight: 700;
+      color: var(--text);
+    }
 
-            .row {
-                margin: 0;
-            }
+    /* 已删除 subtitle 样式 */
 
-            .input-field input {
-                font-size: 16px;
-            }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      /* 间距加大 */
+    }
 
-            .btn {
-                font-size: 14px;
-                padding: 10px;
-            }
-        }
-    </style>
+    /* 已删除 label 样式 */
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    input[type="url"] {
+      flex: 1;
+      /* 控件变大 */
+      padding: 14px 16px;
+      font-size: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input[type="url"]::placeholder {
+      color: #9ca3af;
+    }
+
+    input[type="url"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      /* 聚焦时的光晕 */
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      /* 按钮文字加大 */
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary {
+      padding: 0 24px;
+      /* 按钮加宽 */
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: #ffffff;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-soft);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: default;
+    }
+
+    /* 已删除 hint 样式 */
+
+    .error {
+      margin-top: 4px;
+      font-size: 14px;
+      color: var(--danger);
+      display: none;
+      text-align: center;
+    }
+
+    .error.visible {
+      display: block;
+    }
+
+    .result {
+      margin-top: 24px;
+      padding: 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-result);
+      display: none;
+      font-size: 15px;
+      /* 结果字体微调大 */
+      gap: 12px;
+    }
+
+    .result.visible {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .result-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .result-label {
+      font-size: 13px;
+      color: var(--text-soft);
+      font-weight: 600;
+      min-width: 70px;
+      flex-shrink: 0;
+    }
+
+    .result-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .result-link:hover {
+      text-decoration: underline;
+    }
+
+    #original-url {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--text);
+    }
+
+    .result-actions {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-ghost {
+      padding: 8px 16px;
+      /* 按钮变大 */
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-ghost:hover {
+      background-color: #f9fafb;
+      border-color: #d1d5db;
+    }
+
+    /* 已删除 footer 样式 */
+
+    @media (max-width: 600px) {
+      .card {
+        padding: 24px;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      .btn-primary {
+        width: 100%;
+        padding: 14px 0;
+        /* 移动端按钮高度 */
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <nav>
-        <div class="nav-wrapper blue">
-            <a href="#" class="brand-logo center">URLShortener</a>
-        </div>
-    </nav>
-    <main>
-        <div class="container">
-            <div class="row" style="margin-top: 10%;">
-                <form class="col s12" id="shorten-form">
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <input id="url" type="text" name="url" class="validate" required>
-                            <label for="url">Enter your URL here</label>
-                        </div>
-                    </div>
-                    <button class="btn waves-effect waves-light blue" type="submit">Shorten<i class="material-icons right">link</i></button>
-                </form>
-            </div>
-            <div id="result" class="row"></div>
-        </div>
-    </main>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script>
-        document.querySelector("#shorten-form").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const urlInput = document.querySelector("#url");
-            const url = urlInput.value;
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <div class="title">URL Shortener</div>
+      </div>
 
-            if (!isValidURL(url)) {
-                M.toast({ html: 'Invalid URL! Please enter a valid URL.' });
-                return;
-            }
+      <form id="shorten-form" autocomplete="off">
+        <div class="input-row">
+          <input id="url" type="url" name="url" required placeholder="https://example.com/..." />
+          <button class="btn-primary" type="submit" id="submit-btn">
+            <span id="submit-label">Shorten</span>
+          </button>
+        </div>
+        <p id="error" class="error"></p>
+      </form>
 
-            const formData = new FormData(event.target);
-            const response = await fetch("/shorten", {
-                method: "POST",
-                body: formData
-            });
-            const result = await response.json();
-            document.getElementById("result").innerHTML = `
-                <div class="card">
-                    <div class="card-content">
-                        <span class="card-title">Short URL</span>
-                        <p>
-                            <a href="/${result.short_url}" target="_blank" id="short-url">${result.short_url}</a>
-                            <button class="btn-flat waves-effect" onclick="copyToClipboard('${result.short_url}')">
-                                <i class="material-icons">content_copy</i>
-                            </button>
-                        </p>
-                    </div>
-                </div>`;
+      <div id="result" class="result">
+        <div class="result-row">
+          <div class="result-label">Short URL</div>
+          <a href="#" id="short-url" class="result-link" target="_blank" rel="noopener noreferrer"></a>
+        </div>
+        <div class="result-row">
+          <div class="result-label">Original</div>
+          <span id="original-url"></span>
+        </div>
+        <div class="result-actions">
+          <button type="button" class="btn-ghost" id="copy-btn">Copy</button>
+          <button type="button" class="btn-ghost" id="open-btn">Open</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("shorten-form");
+    const urlInput = document.getElementById("url");
+    const submitBtn = document.getElementById("submit-btn");
+    const submitLabel = document.getElementById("submit-label");
+    const errorEl = document.getElementById("error");
+    const resultEl = document.getElementById("result");
+    const shortUrlEl = document.getElementById("short-url");
+    const originalUrlEl = document.getElementById("original-url");
+    const copyBtn = document.getElementById("copy-btn");
+    const openBtn = document.getElementById("open-btn");
+
+    function setLoading(isLoading) {
+      submitBtn.disabled = isLoading;
+      submitLabel.textContent = isLoading ? "Shortening..." : "Shorten";
+    }
+
+    function isValidURL(url) {
+      try {
+        const u = new URL(url);
+        return !!u.protocol && !!u.hostname;
+      } catch {
+        return false;
+      }
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      errorEl.classList.remove("visible");
+      errorEl.textContent = "";
+      resultEl.classList.remove("visible");
+
+      const url = urlInput.value.trim();
+      if (!url) {
+        errorEl.textContent = "Please enter a URL.";
+        errorEl.classList.add("visible");
+        return;
+      }
+
+      if (!isValidURL(url)) {
+        errorEl.textContent = "This doesn't look like a valid URL.";
+        errorEl.classList.add("visible");
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const response = await fetch("/shorten", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ url }),
         });
 
-        function isValidURL(url) {
-            try {
-                new URL(url);
-                return true;
-            } catch (_) {
-                return false;
-            }
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          const message = data?.detail || "Failed to shorten URL. Please try again.";
+          throw new Error(message);
         }
 
-        function copyToClipboard(text) {
-            const tempInput = document.createElement("input");
-            tempInput.value = window.location.href + text;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-            M.toast({ html: 'Short URL copied to clipboard!' });
+        const result = await response.json();
+        const origin = window.location.origin;
+        const shortPath = `/${result.short_url}`;
+        const shortLink = origin + shortPath;
+
+        shortUrlEl.textContent = shortLink;
+        shortUrlEl.href = shortPath;
+        originalUrlEl.textContent = result.original_url;
+        resultEl.classList.add("visible");
+      } catch (err) {
+        errorEl.textContent = err.message || "Something went wrong. Please try again.";
+        errorEl.classList.add("visible");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function copyShortUrl() {
+      const text = shortUrlEl.textContent;
+      if (!text) return;
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const tempInput = document.createElement("input");
+          tempInput.value = text;
+          document.body.appendChild(tempInput);
+          tempInput.select();
+          document.execCommand("copy");
+          document.body.removeChild(tempInput);
         }
-    </script>
+        // Optional: Provide visual feedback like changing button text temporarily
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => copyBtn.textContent = originalText, 2000);
+      } catch {
+        // ignore
+      }
+    }
+
+    function openShortUrl() {
+      if (!shortUrlEl.href) return;
+      window.open(shortUrlEl.href, "_blank", "noopener,noreferrer");
+    }
+
+    form.addEventListener("submit", handleSubmit);
+    copyBtn.addEventListener("click", copyShortUrl);
+    openBtn.addEventListener("click", openShortUrl);
+
+    urlInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        form.requestSubmit();
+      }
+    });
+  </script>
 </body>
 
 </html>
